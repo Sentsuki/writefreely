@@ -56,6 +56,8 @@ type (
 	}
 )
 
+const maxPassByteLen = 72
+
 func NewUserPage(app *App, r *http.Request, u *User, title string, flashes []string) *UserPage {
 	up := &UserPage{
 		StaticPage: pageForReq(app, r),
@@ -1104,6 +1106,9 @@ func handleViewSubscribers(app *App, u *User, w http.ResponseWriter, r *http.Req
 	c, err := app.db.GetCollection(vars["collection"])
 	if err != nil {
 		return err
+	}
+	if u.ID != c.OwnerID {
+		return ErrCollectionNotFound
 	}
 
 	filter := r.FormValue("filter")
